@@ -16,6 +16,10 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || 'YOUR_MEASUREMENT_ID',
 };
 
+if (typeof window !== 'undefined' && (firebaseConfig.apiKey === 'YOUR_API_KEY' || firebaseConfig.projectId === 'YOUR_PROJECT_ID')) {
+    console.error('CRITICAL: Firebase configuration is missing or using placeholders. Please check your environment variables.');
+}
+
 // Initialize Firebase (prevent multiple initializations)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 

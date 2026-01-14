@@ -128,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setLoading(true);
             await signInWithEmailAndPassword(auth, email, password);
         } catch (err: any) {
+            console.error('Login error:', err);
             setError(getErrorMessage(err.code));
             throw err;
         } finally {
@@ -143,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await updateProfile(user, { displayName });
             await createUserProfile(user, displayName);
         } catch (err: any) {
+            console.error('Signup error:', err);
             setError(getErrorMessage(err.code));
             throw err;
         } finally {
@@ -162,6 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 await createUserProfile(user);
             }
         } catch (err: any) {
+            console.error('Google signin error:', err);
             setError(getErrorMessage(err.code));
             throw err;
         } finally {
@@ -286,6 +289,6 @@ function getErrorMessage(code: string): string {
         case 'auth/network-request-failed':
             return 'Network error. Please check your connection.';
         default:
-            return 'An error occurred. Please try again.';
+            return `An error occurred. Please try again. (${code})`;
     }
 }
