@@ -91,7 +91,7 @@ export default function LoginPage() {
 
                     <div className="flex justify-between items-end">
                         <p className="text-white/50 text-sm">
-                            © 2024 Luna. All rights reserved.
+                            © 2026 Luna. All rights reserved.
                         </p>
 
                         {/* Mobile CTA */}
