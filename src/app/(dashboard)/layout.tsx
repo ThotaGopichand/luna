@@ -63,14 +63,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 className={`
                     transition-all duration-300
                     p-4 lg:p-8
+                    pb-24 lg:pb-8
                     min-h-screen
                     ${collapsed ? 'lg:ml-20' : 'lg:ml-64'}
                 `}
             >
-                {/* Content Container to prevent overflow */}
-                <div className="max-w-7xl mx-auto w-full overflow-hidden">
-                    {children}
-                </div>
+                {children}
             </main>
         </div>
     );

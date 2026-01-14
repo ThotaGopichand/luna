@@ -29,7 +29,7 @@ export default function LoginPage() {
             } else {
                 await signUp(email, password, displayName);
             }
-            router.push('/vault');
+            router.push('/dashboard');
         } catch (err) {
             // Error is handled in auth context
         } finally {
@@ -43,7 +43,7 @@ export default function LoginPage() {
 
         try {
             await signInWithGoogle();
-            router.push('/vault');
+            router.push('/dashboard');
         } catch (err) {
             // Error is handled in auth context
         } finally {
