@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Moon, Mail, Lock, User, Chrome, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Moon, Mail, Lock, User, Chrome, ArrowRight, Eye, EyeOff, ChevronLeft } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { Button, Input } from '@/components/ui';
 
@@ -51,14 +51,30 @@ export default function LoginPage() {
         }
     };
 
+    // State for mobile cover interaction
+    const [showMobileLogin, setShowMobileLogin] = useState(false);
+
+    // ... existing handlers ...
+
     return (
-        <div className="min-h-screen flex">
-            {/* Left Panel - Branding */}
-            <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 bg-gradient-to-br from-primary via-primary-hover to-accent relative overflow-hidden">
+        <div className="min-h-screen flex bg-background relative overflow-hidden">
+            {/* 
+                Cover / Left Panel 
+                - Desktop: Always visible (left half)
+                - Mobile: Visible until 'tap to enter' (full screen absolute)
+            */}
+            <div
+                onClick={() => setShowMobileLogin(true)}
+                className={`
+                    absolute inset-0 z-20 transition-transform duration-500 ease-in-out lg:relative lg:z-auto lg:w-1/2 xl:w-3/5 
+                    bg-gradient-to-br from-primary via-primary-hover to-accent overflow-hidden cursor-pointer lg:cursor-default
+                    ${showMobileLogin ? '-translate-y-full lg:translate-y-0' : 'translate-y-0'}
+                `}
+            >
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
-                <div className="relative z-10 flex flex-col justify-between p-12">
+                <div className="relative z-10 flex flex-col justify-between p-8 lg:p-12 h-full">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-lg flex items-center justify-center">
                             <Moon className="w-6 h-6 text-white" />
@@ -70,32 +86,42 @@ export default function LoginPage() {
                     </div>
 
                     <div className="max-w-md">
-                        {/* Marketing text removed for cleaner UI */}
+                        {/* Clean minimal abstract visuals */}
                     </div>
 
-                    <p className="text-white/50 text-sm">
-                        © 2024 Luna. All rights reserved.
-                    </p>
+                    <div className="flex justify-between items-end">
+                        <p className="text-white/50 text-sm">
+                            © 2024 Luna. All rights reserved.
+                        </p>
+
+                        {/* Mobile CTA */}
+                        <div className="lg:hidden animate-bounce text-white/80 flex flex-col items-center gap-2">
+                            <span className="text-sm font-medium tracking-widest uppercase">Tap to Enter</span>
+                            <ArrowRight className="w-5 h-5 rotate-90" />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Decorative elements */}
-                <div className="absolute -right-40 -top-40 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-accent/20 rounded-full blur-2xl" />
+                <div className="absolute -right-40 -top-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-accent/20 rounded-full blur-2xl animate-pulse" />
             </div>
 
-            {/* Right Panel - Auth Form */}
-            <div className="flex-1 flex items-center justify-center p-8 bg-background">
+            {/* 
+                Right Panel - Auth Form 
+                - Desktop: Always visible (right half)
+                - Mobile: Behind cover, revealed when cover slides up
+            */}
+            <div className="w-full h-full absolute inset-0 lg:static lg:flex-1 flex items-center justify-center p-8 bg-background z-10">
                 <div className="w-full max-w-md">
-                    {/* Mobile logo */}
-                    <div className="lg:hidden flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                            <Moon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl font-bold text-foreground">Luna</h1>
-                            <p className="text-foreground-subtle text-xs">Secure Vault</p>
-                        </div>
-                    </div>
+                    {/* ... Form Content ... */}
+                    {/* Mobile back button */}
+                    <button
+                        onClick={() => setShowMobileLogin(false)}
+                        className="lg:hidden absolute top-6 left-6 p-2 text-foreground-muted hover:text-foreground z-50"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
 
                     <div className="mb-8">
                         <h2 className="text-2xl font-bold text-foreground">
