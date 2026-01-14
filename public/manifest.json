@@ -1,0 +1,56 @@
+{
+  "name": "Luna - Secure Vault & Trading Journal",
+  "short_name": "Luna",
+  "description": "A unified, secure platform for personal document storage and professional-grade trading journaling for Indian markets.",
+  "start_url": "/vault",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "finance",
+    "productivity",
+    "utilities"
+  ],
+  "shortcuts": [
+    {
+      "name": "New Trade",
+      "short_name": "Trade",
+      "description": "Log a new trade",
+      "url": "/journal/new"
+    },
+    {
+      "name": "Document Vault",
+      "short_name": "Vault",
+      "description": "Access your documents",
+      "url": "/vault"
+    }
+  ]
+}
