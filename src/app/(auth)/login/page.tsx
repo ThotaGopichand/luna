@@ -70,25 +70,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="max-w-md">
-                        <h2 className="text-4xl font-bold text-white leading-tight mb-4">
-                            Your Documents. Your Trades.{' '}
-                            <span className="text-white/80">Your Control.</span>
-                        </h2>
-                        <p className="text-lg text-white/70 leading-relaxed">
-                            A unified, secure platform for personal document storage and professional-grade
-                            trading journaling. Built for the Indian markets.
-                        </p>
-
-                        <div className="mt-8 grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white/10 backdrop-blur-lg rounded-xl">
-                                <p className="text-3xl font-bold text-white">256-bit</p>
-                                <p className="text-sm text-white/70">Encrypted Storage</p>
-                            </div>
-                            <div className="p-4 bg-white/10 backdrop-blur-lg rounded-xl">
-                                <p className="text-3xl font-bold text-white">F&O</p>
-                                <p className="text-sm text-white/70">Tax Calculator</p>
-                            </div>
-                        </div>
+                        {/* Marketing text removed for cleaner UI */}
                     </div>
 
                     <p className="text-white/50 text-sm">
