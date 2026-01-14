@@ -29,7 +29,7 @@ export default function LoginPage() {
             } else {
                 await signUp(email, password, displayName);
             }
-            router.push('/dashboard');
+            router.push('/vault');
         } catch (err) {
             // Error is handled in auth context
         } finally {
@@ -43,7 +43,7 @@ export default function LoginPage() {
 
         try {
             await signInWithGoogle();
-            router.push('/dashboard');
+            router.push('/vault');
         } catch (err) {
             // Error is handled in auth context
         } finally {
@@ -85,155 +85,189 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    <div className="max-w-md">
-                        {/* Clean minimal abstract visuals */}
-                    </div>
+                    <div className="max-w-md space-y-6">
+                        {/* Hero Text - Desktop Only */}
+                        <div className="hidden lg:block">
+                            <h2 className="text-3xl xl:text-4xl font-bold text-white mb-4 leading-tight">
+                                Your Financial Command Center
+                            </h2>
+                            <p className="text-lg text-white/80 leading-relaxed">
+                                Securely manage your documents and track your trading journey with military-grade encryption and intelligent insights.
+                            </p>
+                        </div>
 
-                    <div className="flex justify-between items-end">
-                        <p className="text-white/50 text-sm">
-                            © 2026 Luna. All rights reserved.
-                        </p>
+                        {/* Feature Pills - Desktop Only */}
+                        <div className="hidden lg:flex flex-wrap gap-3">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                                <span className="text-sm text-white font-medium">256-bit Encryption</span>
+                            </div>
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+                                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                                <span className="text-sm text-white font-medium">Real-time Analytics</span>
+                            </div>
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+                                <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                                <span className="text-sm text-white font-medium">Tax Calculator</span>
+                            </div>
+                        </div>
 
-                        {/* Mobile CTA */}
-                        <div className="lg:hidden animate-bounce text-white/80 flex flex-col items-center gap-2">
-                            <span className="text-sm font-medium tracking-widest uppercase">Tap to Enter</span>
-                            <ArrowRight className="w-5 h-5 rotate-90" />
+                        {/* Mobile tagline */}
+                        <div className="lg:hidden text-center">
+                            <h2 className="text-2xl font-bold text-white mb-2">
+                                Secure. Smart. Simple.
+                            </h2>
+                            <p className="text-white/70 text-sm">
+                                Your documents and trades, protected and organized
+                            </p>
                         </div>
                     </div>
-                </div>
 
-                {/* Decorative elements */}
-                <div className="absolute -right-40 -top-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-accent/20 rounded-full blur-2xl animate-pulse" />
-            </div>
+                    <div className="flex justify-between items-end">\r
+                        <p className=\"text-white/50 text-sm\">\r
+                        © 2026 Luna. All rights reserved.\r
+                    </p>\r
+                    \r
+                    {/* Mobile CTA */}\r
+                    <div className=\"lg:hidden animate-bounce text-white/80 flex flex-col items-center gap-2\">\r
+                    <span className=\"text-sm font-medium tracking-widest uppercase\">Tap to Enter</span>\r
+                <ArrowRight className=\"w-5 h-5 rotate-90\" />\r
+            </div>\r
+        </div>
+                </div >
 
-            {/* 
+        {/* Decorative elements */ }
+        < div className = "absolute -right-40 -top-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-accent/20 rounded-full blur-2xl animate-pulse" />
+            </div >
+
+    {/* 
                 Right Panel - Auth Form 
                 - Desktop: Always visible (right half)
                 - Mobile: Behind cover, revealed when cover slides up
             */}
-            <div className="w-full h-full absolute inset-0 lg:static lg:flex-1 flex items-center justify-center p-8 bg-background z-10">
-                <div className="w-full max-w-md">
-                    {/* ... Form Content ... */}
-                    {/* Mobile back button */}
-                    <button
-                        onClick={() => setShowMobileLogin(false)}
-                        className="lg:hidden absolute top-6 left-6 p-2 text-foreground-muted hover:text-foreground z-50"
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
+        < div className = "w-full h-full absolute inset-0 lg:static lg:flex-1 flex items-center justify-center p-8 bg-background z-10" >
+            <div className="w-full max-w-md">
+                {/* ... Form Content ... */}
+                {/* Mobile back button */}
+                <button
+                    onClick={() => setShowMobileLogin(false)}
+                    className="lg:hidden absolute top-6 left-6 p-2 text-foreground-muted hover:text-foreground z-50"
+                >
+                    <ChevronLeft className="w-6 h-6" />
+                </button>
 
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-foreground">
-                            {isLogin ? 'Welcome back' : 'Create account'}
-                        </h2>
-                        <p className="text-foreground-muted mt-2">
-                            {isLogin
-                                ? 'Sign in to access your vault and trading journal'
-                                : 'Get started with your secure vault today'}
-                        </p>
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-foreground">
+                        {isLogin ? 'Welcome back' : 'Create account'}
+                    </h2>
+                    <p className="text-foreground-muted mt-2">
+                        {isLogin
+                            ? 'Sign in to access your vault and trading journal'
+                            : 'Get started with your secure vault today'}
+                    </p>
+                </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm">
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    {!isLogin && (
+                        <Input
+                            label="Full Name"
+                            type="text"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            placeholder="Enter your name"
+                            icon={<User className="w-4 h-4" />}
+                            required
+                        />
+                    )}
+
+                    <Input
+                        label="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        icon={<Mail className="w-4 h-4" />}
+                        required
+                    />
+
+                    <div className="relative">
+                        <Input
+                            label="Password"
+                            type={showPassword ? 'text' : 'password'}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            icon={<Lock className="w-4 h-4" />}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-9 text-foreground-subtle hover:text-foreground transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm">
-                            {error}
+                    {isLogin && (
+                        <div className="flex justify-end">
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm text-accent hover:text-accent-hover transition-colors"
+                            >
+                                Forgot password?
+                            </Link>
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {!isLogin && (
-                            <Input
-                                label="Full Name"
-                                type="text"
-                                value={displayName}
-                                onChange={(e) => setDisplayName(e.target.value)}
-                                placeholder="Enter your name"
-                                icon={<User className="w-4 h-4" />}
-                                required
-                            />
-                        )}
-
-                        <Input
-                            label="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Enter your email"
-                            icon={<Mail className="w-4 h-4" />}
-                            required
-                        />
-
-                        <div className="relative">
-                            <Input
-                                label="Password"
-                                type={showPassword ? 'text' : 'password'}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password"
-                                icon={<Lock className="w-4 h-4" />}
-                                required
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-9 text-foreground-subtle hover:text-foreground transition-colors"
-                            >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                        </div>
-
-                        {isLogin && (
-                            <div className="flex justify-end">
-                                <Link
-                                    href="/forgot-password"
-                                    className="text-sm text-accent hover:text-accent-hover transition-colors"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
-                        )}
-
-                        <Button
-                            type="submit"
-                            loading={isLoading}
-                            className="w-full"
-                        >
-                            {isLogin ? 'Sign In' : 'Create Account'}
-                            <ArrowRight className="w-4 h-4" />
-                        </Button>
-                    </form>
-
-                    <div className="my-6 flex items-center gap-4">
-                        <div className="flex-1 h-px bg-border" />
-                        <span className="text-foreground-subtle text-sm">or continue with</span>
-                        <div className="flex-1 h-px bg-border" />
-                    </div>
-
                     <Button
-                        variant="outline"
+                        type="submit"
+                        loading={isLoading}
                         className="w-full"
-                        onClick={handleGoogleSignIn}
-                        disabled={isLoading}
                     >
-                        <Chrome className="w-5 h-5" />
-                        Google
+                        {isLogin ? 'Sign In' : 'Create Account'}
+                        <ArrowRight className="w-4 h-4" />
                     </Button>
+                </form>
 
-                    <p className="mt-8 text-center text-foreground-muted text-sm">
-                        {isLogin ? "Don't have an account? " : 'Already have an account? '}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsLogin(!isLogin);
-                                clearError();
-                            }}
-                            className="text-accent hover:text-accent-hover font-medium transition-colors"
-                        >
-                            {isLogin ? 'Sign up' : 'Sign in'}
-                        </button>
-                    </p>
+                <div className="my-6 flex items-center gap-4">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-foreground-subtle text-sm">or continue with</span>
+                    <div className="flex-1 h-px bg-border" />
                 </div>
+
+                <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
+                >
+                    <Chrome className="w-5 h-5" />
+                    Google
+                </Button>
+
+                <p className="mt-8 text-center text-foreground-muted text-sm">
+                    {isLogin ? "Don't have an account? " : 'Already have an account? '}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsLogin(!isLogin);
+                            clearError();
+                        }}
+                        className="text-accent hover:text-accent-hover font-medium transition-colors"
+                    >
+                        {isLogin ? 'Sign up' : 'Sign in'}
+                    </button>
+                </p>
             </div>
-        </div>
+            </div >
+        </div >
     );
 }
