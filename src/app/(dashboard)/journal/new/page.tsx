@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -60,10 +60,19 @@ export default function NewTradePage() {
     const [showChargesBreakdown, setShowChargesBreakdown] = useState(false);
 
     // Calculate P&L when inputs change
-    const calculatePnL = () => {
+    useEffect(() => {
         if (!entryPrice || !exitPrice || !quantity) {
             setGrossPnL(0);
             setNetPnL(0);
+            setCharges({
+                stt: 0,
+                exchangeCharges: 0,
+                gst: 0,
+                stampDuty: 0,
+                sebiCharges: 0,
+                brokerage: 0,
+                totalCharges: 0,
+            });
             return;
         }
 
@@ -71,6 +80,11 @@ export default function NewTradePage() {
         const exit = parseFloat(exitPrice);
         const qty = parseInt(quantity);
         const lot = parseInt(lotSize) || 1;
+
+        // Validate parsed values
+        if (isNaN(entry) || isNaN(exit) || isNaN(qty) || entry <= 0 || exit <= 0 || qty <= 0) {
+            return;
+        }
 
         const gross = calculateGrossPnL(entry, exit, qty, lot, tradeType);
         const { buyValue, sellValue, turnover } = calculateTurnover(entry, exit, qty, lot);
@@ -90,7 +104,7 @@ export default function NewTradePage() {
         setGrossPnL(gross);
         setNetPnL(net);
         setCharges(calculatedCharges);
-    };
+    }, [entryPrice, exitPrice, quantity, lotSize, tradeType, instrument, userSettings]);
 
     // Screenshot upload
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -130,7 +144,7 @@ export default function NewTradePage() {
         if (data.type) setTradeType(data.type);
         if (data.instrument) setInstrument(data.instrument);
         setShowLunaProtocol(false);
-        calculatePnL();
+        // P&L will be recalculated automatically by useEffect
     };
 
     // Save trade
@@ -285,10 +299,7 @@ export default function NewTradePage() {
                                     step="0.01"
                                     placeholder="0.00"
                                     value={entryPrice}
-                                    onChange={(e) => {
-                                        setEntryPrice(e.target.value);
-                                        setTimeout(calculatePnL, 0);
-                                    }}
+                                    onChange={(e) => setEntryPrice(e.target.value)}
                                 />
                                 <Input
                                     label="Exit Price"
@@ -296,30 +307,21 @@ export default function NewTradePage() {
                                     step="0.01"
                                     placeholder="0.00"
                                     value={exitPrice}
-                                    onChange={(e) => {
-                                        setExitPrice(e.target.value);
-                                        setTimeout(calculatePnL, 0);
-                                    }}
+                                    onChange={(e) => setExitPrice(e.target.value)}
                                 />
                                 <Input
                                     label="Quantity"
                                     type="number"
                                     placeholder="1"
                                     value={quantity}
-                                    onChange={(e) => {
-                                        setQuantity(e.target.value);
-                                        setTimeout(calculatePnL, 0);
-                                    }}
+                                    onChange={(e) => setQuantity(e.target.value)}
                                 />
                                 <Input
                                     label="Lot Size"
                                     type="number"
                                     placeholder="1"
                                     value={lotSize}
-                                    onChange={(e) => {
-                                        setLotSize(e.target.value);
-                                        setTimeout(calculatePnL, 0);
-                                    }}
+                                    onChange={(e) => setLotSize(e.target.value)}
                                     hint="For F&O trades"
                                 />
                             </div>
