@@ -7,7 +7,7 @@ import {
     BarChart3, Target, AlertCircle, ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { Header } from '@/components/layout';
+
 import { Button, Card, Input, Badge, Select } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { getTrades } from '@/lib/firestore';
@@ -109,18 +109,18 @@ export default function JournalPage() {
 
     return (
         <div className="min-h-screen">
-            <Header
-                title="Trading Journal"
-                subtitle="Track your P&L and improve your edge"
-                actions={
-                    <Link href="/journal/new">
-                        <Button>
-                            <Plus className="w-4 h-4" />
-                            New Trade
-                        </Button>
-                    </Link>
-                }
-            />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 pb-0">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Trading Journal</h1>
+                    <p className="text-foreground-muted">Track your P&L and improve your edge</p>
+                </div>
+                <Link href="/journal/new">
+                    <Button>
+                        <Plus className="w-4 h-4" />
+                        New Trade
+                    </Button>
+                </Link>
+            </div>
 
             <div className="p-6 space-y-6">
                 {/* Stats Cards */}

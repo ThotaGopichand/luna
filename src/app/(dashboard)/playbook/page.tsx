@@ -5,7 +5,7 @@ import {
     Plus, Edit2, Trash2, Save, X, BookOpen, Target,
     CheckCircle, XCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { Header } from '@/components/layout';
+
 import { Button, Card, CardHeader, Input, Modal, ModalActions } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { getPlaybookRules, createPlaybookRule, updatePlaybookRule, deletePlaybookRule } from '@/lib/firestore';
@@ -152,16 +152,16 @@ export default function PlaybookPage() {
 
     return (
         <div className="min-h-screen">
-            <Header
-                title="Playbook"
-                subtitle="Define and follow your trading rules"
-                actions={
-                    <Button onClick={() => openModal()}>
-                        <Plus className="w-4 h-4" />
-                        New Strategy
-                    </Button>
-                }
-            />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 pb-0">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Playbook</h1>
+                    <p className="text-foreground-muted">Define and follow your trading rules</p>
+                </div>
+                <Button onClick={() => openModal()}>
+                    <Plus className="w-4 h-4" />
+                    New Strategy
+                </Button>
+            </div>
 
             <div className="p-6 space-y-6">
                 {/* Info Card */}

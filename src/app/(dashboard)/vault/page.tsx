@@ -8,7 +8,7 @@ import {
     MoreVertical, X
 } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
-import { Header } from '@/components/layout';
+
 import { Button, Card, Input, Modal, ModalActions, Badge } from '@/components/ui';
 import { Tag as TagComponent } from '@/components/ui/Badge';
 import { useAuth } from '@/lib/auth';
@@ -195,16 +195,16 @@ export default function VaultPage() {
 
     return (
         <div className="min-h-screen">
-            <Header
-                title="Document Vault"
-                subtitle={`${documents.length} documents stored securely`}
-                actions={
-                    <Button onClick={() => setShowUploadModal(true)}>
-                        <Plus className="w-4 h-4" />
-                        Upload
-                    </Button>
-                }
-            />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 pb-0">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Document Vault</h1>
+                    <p className="text-foreground-muted">{documents.length} documents stored securely</p>
+                </div>
+                <Button onClick={() => setShowUploadModal(true)}>
+                    <Plus className="w-4 h-4" />
+                    Upload
+                </Button>
+            </div>
 
             <div className="p-6 space-y-6">
                 {/* Expiry Alerts */}
@@ -351,8 +351,8 @@ export default function VaultPage() {
                                         <button
                                             onClick={() => toggleOffline(doc)}
                                             className={`p-2 rounded-lg transition-colors ${doc.isOfflineAvailable
-                                                    ? 'text-success bg-success/10'
-                                                    : 'text-foreground-muted hover:text-foreground hover:bg-background-tertiary'
+                                                ? 'text-success bg-success/10'
+                                                : 'text-foreground-muted hover:text-foreground hover:bg-background-tertiary'
                                                 }`}
                                             title={doc.isOfflineAvailable ? 'Available offline' : 'Make available offline'}
                                         >

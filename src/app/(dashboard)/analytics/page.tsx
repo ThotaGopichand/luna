@@ -10,7 +10,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     BarChart, Bar, Cell, PieChart as RePieChart, Pie, Legend
 } from 'recharts';
-import { Header } from '@/components/layout';
+
 import { Card, CardHeader, Button, Select } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { getTrades } from '@/lib/firestore';
@@ -197,10 +197,12 @@ export default function AnalyticsPage() {
 
     return (
         <div className="min-h-screen">
-            <Header
-                title="Analytics"
-                subtitle="Visual insights into your trading performance"
-                actions={
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 pb-0">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+                    <p className="text-foreground-muted">Visual insights into your trading performance</p>
+                </div>
+                <div className="w-full md:w-auto">
                     <Select
                         options={[
                             { value: '7', label: 'Last 7 days' },
@@ -211,8 +213,8 @@ export default function AnalyticsPage() {
                         value={timeRange}
                         onChange={(e) => setTimeRange(e.target.value)}
                     />
-                }
-            />
+                </div>
+            </div>
 
             <div className="p-6 space-y-6">
                 {/* Summary Cards */}

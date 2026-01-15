@@ -5,7 +5,7 @@ import {
     Shield, Bell, Palette, Calculator, LogOut, AlertTriangle,
     Save, Check, User, Mail, Key
 } from 'lucide-react';
-import { Header } from '@/components/layout';
+
 import { Button, Card, CardHeader, Input, Select } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { TAX_RATES } from '@/lib/tax-calculator';
@@ -54,10 +54,12 @@ export default function SettingsPage() {
 
     return (
         <div className="min-h-screen">
-            <Header
-                title="Settings"
-                subtitle="Manage your preferences and security"
-            />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 pb-0 max-w-4xl mx-auto w-full">
+                <div>
+                    <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+                    <p className="text-foreground-muted">Manage your preferences and security</p>
+                </div>
+            </div>
 
             <div className="p-6 max-w-4xl mx-auto space-y-6">
                 {/* Profile Section */}
