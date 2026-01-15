@@ -214,9 +214,9 @@ export default function NewTradePage() {
 
             await createTrade(user.uid, trade);
             router.push('/journal');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving trade:', error);
-            alert('Failed to save trade');
+            alert(error.message || 'Failed to save trade. Please try again.');
         } finally {
             setSaving(false);
         }

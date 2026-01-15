@@ -1,10 +1,11 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebase';
 import { v4 as uuidv4 } from 'uuid';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
+const UPLOAD_TIMEOUT = 120000; // 2 minutes timeout
 
 interface UploadResult {
     url: string;
@@ -13,12 +14,13 @@ interface UploadResult {
 }
 
 /**
- * Upload a file to Firebase Storage
+ * Upload a file to Firebase Storage with timeout and better error handling
  */
 export async function uploadFile(
     userId: string,
     file: File,
-    folder: 'documents' | 'screenshots' | 'contract-notes'
+    folder: 'documents' | 'screenshots' | 'contract-notes',
+    onProgress?: (progress: number) => void
 ): Promise<UploadResult> {
     // Validate file
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -34,24 +36,70 @@ export async function uploadFile(
     const uniqueFileName = `${uuidv4()}.${extension}`;
     const storagePath = `users/${userId}/${folder}/${uniqueFileName}`;
 
-    // Upload to Firebase Storage
+    // Create storage reference
     const storageRef = ref(storage, storagePath);
-    await uploadBytes(storageRef, file, {
-        contentType: file.type,
-        customMetadata: {
-            originalName: file.name,
-            uploadedAt: new Date().toISOString(),
-        },
+
+    return new Promise((resolve, reject) => {
+        // Create upload task
+        const uploadTask = uploadBytesResumable(storageRef, file, {
+            contentType: file.type,
+            customMetadata: {
+                originalName: file.name,
+                uploadedAt: new Date().toISOString(),
+            },
+        });
+
+        // Set up timeout
+        const timeoutId = setTimeout(() => {
+            uploadTask.cancel();
+            reject(new Error('Upload timed out. Please check your internet connection and try again.'));
+        }, UPLOAD_TIMEOUT);
+
+        // Monitor upload progress
+        uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                if (onProgress) {
+                    onProgress(progress);
+                }
+                console.log(`Upload progress: ${progress.toFixed(1)}%`);
+            },
+            (error) => {
+                clearTimeout(timeoutId);
+                console.error('Upload error:', error);
+
+                // Handle specific error codes
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        reject(new Error('You do not have permission to upload files. Please sign in again.'));
+                        break;
+                    case 'storage/canceled':
+                        reject(new Error('Upload was cancelled.'));
+                        break;
+                    case 'storage/retry-limit-exceeded':
+                        reject(new Error('Upload failed after multiple retries. Please try again.'));
+                        break;
+                    default:
+                        reject(new Error(`Upload failed: ${error.message}`));
+                }
+            },
+            async () => {
+                clearTimeout(timeoutId);
+                try {
+                    // Upload completed successfully, get download URL
+                    const url = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve({
+                        url,
+                        ref: storagePath,
+                        fileName: file.name,
+                    });
+                } catch (urlError) {
+                    reject(new Error('Upload succeeded but failed to get download URL.'));
+                }
+            }
+        );
     });
-
-    // Get download URL
-    const url = await getDownloadURL(storageRef);
-
-    return {
-        url,
-        ref: storagePath,
-        fileName: file.name,
-    };
 }
 
 /**

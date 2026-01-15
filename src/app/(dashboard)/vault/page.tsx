@@ -134,9 +134,9 @@ export default function VaultPage() {
 
             await loadDocuments();
             resetUploadForm();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Upload error:', error);
-            alert('Failed to upload file');
+            alert(error.message || 'Failed to upload file. Please try again.');
         } finally {
             setUploading(false);
         }
