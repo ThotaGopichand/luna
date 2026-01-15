@@ -325,7 +325,18 @@ export default function AnalyticsPage() {
                                         dataKey={pnlView === 'gross' ? 'cumulativeGross' : 'cumulativeNet'}
                                         stroke={totalNetPnL >= 0 ? '#10b981' : '#f43f5e'}
                                         strokeWidth={2}
-                                        dot={false}
+                                        dot={{
+                                            r: 5,
+                                            fill: totalNetPnL >= 0 ? '#10b981' : '#f43f5e',
+                                            stroke: '#1e293b',
+                                            strokeWidth: 2,
+                                        }}
+                                        activeDot={{
+                                            r: 7,
+                                            fill: totalNetPnL >= 0 ? '#10b981' : '#f43f5e',
+                                            stroke: '#fff',
+                                            strokeWidth: 2,
+                                        }}
                                     />
                                 </LineChart>
                             </ResponsiveContainer>
