@@ -1,0 +1,2 @@
+﻿src/app/(dashboard)/journal/new/page.tsx(195,17): error TS2322: Type '{ title: string; subtitle: string; actions: Element; }' is not assignable to type 'IntrinsicAttributes & HeaderProps'.
+  Property 'actions' does not exist on type 'IntrinsicAttributes & HeaderProps'.

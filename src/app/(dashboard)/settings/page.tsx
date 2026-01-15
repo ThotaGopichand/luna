@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Shield, Bell, Palette, Calculator, LogOut, AlertTriangle,
-    Save, Check, User, Mail, Key
+    Save, Check, User, Mail, Key, ShieldAlert, Unlock, Lock
 } from 'lucide-react';
 
 import { Button, Card, CardHeader, Input, Select } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { TAX_RATES } from '@/lib/tax-calculator';
+import { auth } from '@/lib/firebase';
 
 export default function SettingsPage() {
     const { user, userProfile, userSettings, updateUserSettings, logoutAllDevices } = useAuth();
@@ -19,6 +20,66 @@ export default function SettingsPage() {
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
+
+    // Emergency mode state
+    const [emergencyLocked, setEmergencyLocked] = useState(false);
+    const [emergencyAttempts, setEmergencyAttempts] = useState(0);
+    const [unlocking, setUnlocking] = useState(false);
+    const [unlockSuccess, setUnlockSuccess] = useState(false);
+
+    // Fetch emergency status on mount
+    useEffect(() => {
+        checkEmergencyStatus();
+    }, []);
+
+    const checkEmergencyStatus = async () => {
+        try {
+            const res = await fetch('/api/auth/emergency-status');
+            const data = await res.json();
+            setEmergencyLocked(data.isLocked);
+            setEmergencyAttempts(data.failedAttempts);
+        } catch (error) {
+            console.error('Failed to check emergency status:', error);
+        }
+    };
+
+    const handleUnlockEmergency = async () => {
+        setUnlocking(true);
+        try {
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                alert('Please sign in again');
+                return;
+            }
+
+            const idToken = await currentUser.getIdToken();
+
+            const res = await fetch('/api/auth/unlock-emergency', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Failed to unlock');
+                return;
+            }
+
+            setEmergencyLocked(false);
+            setEmergencyAttempts(0);
+            setUnlockSuccess(true);
+            setTimeout(() => setUnlockSuccess(false), 3000);
+        } catch (error) {
+            console.error('Unlock emergency error:', error);
+            alert('Failed to unlock emergency access');
+        } finally {
+            setUnlocking(false);
+        }
+    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -222,6 +283,53 @@ export default function SettingsPage() {
                                     <p className="text-sm text-foreground-muted">
                                         Last login: {user?.metadata?.lastSignInTime || 'Unknown'}
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Emergency Mode Management */}
+                        <div className={`p-4 border rounded-lg ${emergencyLocked ? 'bg-warning/10 border-warning/30' : 'bg-background-tertiary border-border'}`}>
+                            <div className="flex items-start gap-3">
+                                <ShieldAlert className={`w-5 h-5 flex-shrink-0 mt-0.5 ${emergencyLocked ? 'text-warning' : 'text-foreground-muted'}`} />
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <p className={`font-medium ${emergencyLocked ? 'text-warning' : 'text-foreground'}`}>
+                                            Emergency Mode Access
+                                        </p>
+                                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${emergencyLocked
+                                                ? 'bg-danger/20 text-danger'
+                                                : 'bg-success/20 text-success'
+                                            }`}>
+                                            {emergencyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                                            {emergencyLocked ? 'Locked' : 'Active'}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-foreground-muted mt-1">
+                                        {emergencyLocked
+                                            ? `Emergency access is locked after ${emergencyAttempts} failed attempts.`
+                                            : 'Emergency password access is available for use on other devices.'}
+                                    </p>
+
+                                    {emergencyLocked && (
+                                        <Button
+                                            variant="outline"
+                                            className="mt-4"
+                                            onClick={handleUnlockEmergency}
+                                            loading={unlocking}
+                                        >
+                                            {unlockSuccess ? (
+                                                <>
+                                                    <Check className="w-4 h-4" />
+                                                    Unlocked!
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Unlock className="w-4 h-4" />
+                                                    Unlock Emergency Access
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>
