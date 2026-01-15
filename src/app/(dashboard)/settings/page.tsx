@@ -15,7 +15,7 @@ export default function SettingsPage() {
     const { user, userProfile, userSettings, updateUserSettings, logoutAllDevices } = useAuth();
 
     const [brokerageRate, setBrokerageRate] = useState(userSettings?.brokerageRate?.toString() || '20');
-    const [defaultState, setDefaultState] = useState(userSettings?.defaultStampDutyState || 'Maharashtra');
+    const [defaultState, setDefaultState] = useState(userSettings?.defaultStampDutyState || 'Andhra Pradesh');
     const [notifications, setNotifications] = useState(userSettings?.notifications ?? true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -297,8 +297,8 @@ export default function SettingsPage() {
                                             Emergency Mode Access
                                         </p>
                                         <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${emergencyLocked
-                                                ? 'bg-danger/20 text-danger'
-                                                : 'bg-success/20 text-success'
+                                            ? 'bg-danger/20 text-danger'
+                                            : 'bg-success/20 text-success'
                                             }`}>
                                             {emergencyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                                             {emergencyLocked ? 'Locked' : 'Active'}

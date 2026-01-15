@@ -40,7 +40,7 @@ const googleProvider = new GoogleAuthProvider();
 const DEFAULT_SETTINGS: UserSettings = {
     theme: 'dark',
     notifications: true,
-    defaultStampDutyState: 'Maharashtra',
+    defaultStampDutyState: 'Andhra Pradesh',
     brokerageRate: 20, // ₹20 per order (typical discount broker)
 };
 

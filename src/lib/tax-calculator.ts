@@ -24,8 +24,9 @@ export const TAX_RATES = {
     // GST on brokerage + exchange + SEBI
     GST: 0.18, // 18%
 
-    // Stamp Duty (state-wise, using Maharashtra as default)
+    // Stamp Duty (state-wise, using Andhra Pradesh as default)
     STAMP_DUTY: {
+        'Andhra Pradesh': 0.00015, // 0.015%
         'Maharashtra': 0.00015, // 0.015%
         'Gujarat': 0.00015,
         'Karnataka': 0.00015,
@@ -60,7 +61,7 @@ export function calculateTradingCharges(params: TaxCalculationParams): TradeChar
         sellValue,
         buyValue,
         isIntraday = true,
-        state = 'Maharashtra',
+        state = 'Andhra Pradesh',
         brokeragePerOrder = 20,
         numberOfOrders = 2, // Entry + Exit
     } = params;

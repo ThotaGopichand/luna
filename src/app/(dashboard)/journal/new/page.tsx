@@ -81,7 +81,7 @@ export default function NewTradePage() {
             turnover,
             sellValue,
             buyValue,
-            state: userSettings?.defaultStampDutyState || 'Maharashtra',
+            state: userSettings?.defaultStampDutyState || 'Andhra Pradesh',
             brokeragePerOrder: userSettings?.brokerageRate || 20,
         });
 
@@ -167,7 +167,7 @@ export default function NewTradePage() {
                 turnover,
                 sellValue,
                 buyValue,
-                state: userSettings?.defaultStampDutyState || 'Maharashtra',
+                state: userSettings?.defaultStampDutyState || 'Andhra Pradesh',
                 brokeragePerOrder: userSettings?.brokerageRate || 20,
             });
 
