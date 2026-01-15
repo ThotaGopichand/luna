@@ -152,19 +152,40 @@ export default function NewTradePage() {
                 screenshotRef = result.ref;
             }
 
+            // Calculate P&L synchronously before saving to ensure correct values
+            const entry = parseFloat(entryPrice);
+            const exit = parseFloat(exitPrice);
+            const qty = parseInt(quantity);
+            const lot = parseInt(lotSize) || 1;
+
+            const calculatedGrossPnL = calculateGrossPnL(entry, exit, qty, lot, tradeType);
+            const { buyValue, sellValue, turnover } = calculateTurnover(entry, exit, qty, lot);
+
+            const calculatedCharges = calculateTradingCharges({
+                instrument,
+                grossPnL: calculatedGrossPnL,
+                turnover,
+                sellValue,
+                buyValue,
+                state: userSettings?.defaultStampDutyState || 'Maharashtra',
+                brokeragePerOrder: userSettings?.brokerageRate || 20,
+            });
+
+            const calculatedNetPnL = calculateNetPnL(calculatedGrossPnL, calculatedCharges);
+
             const trade: Omit<Trade, 'id'> = {
                 userId: user.uid,
                 date: new Date(date).getTime(),
                 instrument,
                 symbol: symbol.toUpperCase(),
                 type: tradeType,
-                entryPrice: parseFloat(entryPrice),
-                exitPrice: parseFloat(exitPrice),
-                quantity: parseInt(quantity),
-                lotSize: parseInt(lotSize) || 1,
-                grossPnL,
-                netPnL,
-                charges,
+                entryPrice: entry,
+                exitPrice: exit,
+                quantity: qty,
+                lotSize: lot,
+                grossPnL: calculatedGrossPnL,
+                netPnL: calculatedNetPnL,
+                charges: calculatedCharges,
                 strategy,
                 mistakes,
                 mood,
