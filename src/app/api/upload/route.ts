@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import cloudinary from '@/lib/cloudinary';
 import { v4 as uuidv4 } from 'uuid';
-import { cookies } from 'next/headers';
 import { adminAuth } from '@/lib/firebase-admin';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -9,45 +8,28 @@ const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const ALLOWED_FOLDERS = ['documents', 'screenshots', 'contract-notes'];
 
 /**
- * Verify the user's Firebase session
+ * Verify the user's Firebase ID token from Authorization header
  */
-async function verifySession(request: NextRequest): Promise<string | null> {
+async function verifyAuthToken(request: NextRequest): Promise<string | null> {
     try {
-        // Try to get session from cookie
-        const cookieStore = await cookies();
-        const sessionCookie = cookieStore.get('firebase-session')?.value;
-
-        if (sessionCookie) {
-            const decodedClaims = await adminAuth().verifySessionCookie(sessionCookie, true);
-            return decodedClaims.uid;
-        }
-
-        // Fallback: Try Authorization header (for client-side calls)
         const authHeader = request.headers.get('Authorization');
-        if (authHeader?.startsWith('Bearer ')) {
-            const token = authHeader.substring(7);
-            const decodedToken = await adminAuth().verifyIdToken(token);
-            return decodedToken.uid;
+        if (!authHeader?.startsWith('Bearer ')) {
+            return null;
         }
 
-        return null;
+        const token = authHeader.substring(7);
+        const decodedToken = await adminAuth().verifyIdToken(token);
+        return decodedToken.uid;
     } catch (error) {
-        console.error('Session verification error:', error);
+        console.error('Token verification error:', error);
         return null;
     }
 }
 
 export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
-        const file = formData.get('file') as File;
-        const userId = formData.get('userId') as string;
-        const folder = formData.get('folder') as string || 'documents';
-
-        // ============ SECURITY CHECKS ============
-
-        // 1. Verify user is authenticated
-        const authenticatedUserId = await verifySession(request);
+        // ============ AUTHENTICATION ============
+        const authenticatedUserId = await verifyAuthToken(request);
         if (!authenticatedUserId) {
             return NextResponse.json(
                 { error: 'Unauthorized. Please log in again.' },
@@ -55,7 +37,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 2. Verify user can only upload to their own folder
+        const formData = await request.formData();
+        const file = formData.get('file') as File;
+        const userId = formData.get('userId') as string;
+        const folder = formData.get('folder') as string || 'documents';
+
+        // ============ AUTHORIZATION ============
+
+        // Verify user can only upload to their own folder
         if (userId !== authenticatedUserId) {
             return NextResponse.json(
                 { error: 'Forbidden. You can only upload to your own storage.' },
@@ -63,7 +52,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 3. Validate folder is allowed
+        // Validate folder is allowed
         if (!ALLOWED_FOLDERS.includes(folder)) {
             return NextResponse.json(
                 { error: 'Invalid folder specified.' },

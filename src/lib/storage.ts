@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from './firebase';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -8,6 +9,21 @@ interface UploadResult {
     url: string;
     ref: string;
     fileName: string;
+}
+
+/**
+ * Get the current user's ID token for API authentication
+ */
+async function getAuthToken(): Promise<string | null> {
+    const user = auth.currentUser;
+    if (!user) return null;
+
+    try {
+        return await user.getIdToken();
+    } catch (error) {
+        console.error('Error getting ID token:', error);
+        return null;
+    }
 }
 
 /**
@@ -26,6 +42,12 @@ export async function uploadFile(
 
     if (file.size > MAX_FILE_SIZE) {
         throw new Error('File size exceeds 10MB limit');
+    }
+
+    // Get auth token
+    const token = await getAuthToken();
+    if (!token) {
+        throw new Error('You must be logged in to upload files.');
     }
 
     // Show initial progress
@@ -47,6 +69,9 @@ export async function uploadFile(
 
         const response = await fetch('/api/upload', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
             body: formData,
         });
 
@@ -80,11 +105,18 @@ export async function uploadFile(
  * Delete a file from Cloudinary
  */
 export async function deleteFile(publicId: string): Promise<void> {
+    // Get auth token
+    const token = await getAuthToken();
+    if (!token) {
+        throw new Error('You must be logged in to delete files.');
+    }
+
     try {
         const response = await fetch('/api/delete-file', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({ publicId }),
         });
