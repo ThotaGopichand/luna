@@ -1,11 +1,8 @@
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebase';
 import { v4 as uuidv4 } from 'uuid';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png'];
-const UPLOAD_TIMEOUT = 120000; // 2 minutes timeout
 
 interface UploadResult {
     url: string;
@@ -14,7 +11,7 @@ interface UploadResult {
 }
 
 /**
- * Upload a file to Firebase Storage with timeout and better error handling
+ * Upload a file to Cloudinary via API route
  */
 export async function uploadFile(
     userId: string,
@@ -31,100 +28,86 @@ export async function uploadFile(
         throw new Error('File size exceeds 10MB limit');
     }
 
-    // Generate unique file name
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'file';
-    const uniqueFileName = `${uuidv4()}.${extension}`;
-    const storagePath = `users/${userId}/${folder}/${uniqueFileName}`;
+    // Show initial progress
+    if (onProgress) {
+        onProgress(10);
+    }
 
-    // Create storage reference
-    const storageRef = ref(storage, storagePath);
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('userId', userId);
+    formData.append('folder', folder);
 
-    return new Promise((resolve, reject) => {
-        // Create upload task
-        const uploadTask = uploadBytesResumable(storageRef, file, {
-            contentType: file.type,
-            customMetadata: {
-                originalName: file.name,
-                uploadedAt: new Date().toISOString(),
-            },
+    try {
+        // Update progress to show upload starting
+        if (onProgress) {
+            onProgress(30);
+        }
+
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
         });
 
-        // Set up timeout
-        const timeoutId = setTimeout(() => {
-            uploadTask.cancel();
-            reject(new Error('Upload timed out. Please check your internet connection and try again.'));
-        }, UPLOAD_TIMEOUT);
+        if (onProgress) {
+            onProgress(80);
+        }
 
-        // Monitor upload progress
-        uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                if (onProgress) {
-                    onProgress(progress);
-                }
-                console.log(`Upload progress: ${progress.toFixed(1)}%`);
-            },
-            (error) => {
-                clearTimeout(timeoutId);
-                console.error('Upload error:', error);
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Upload failed');
+        }
 
-                // Handle specific error codes
-                switch (error.code) {
-                    case 'storage/unauthorized':
-                        reject(new Error('You do not have permission to upload files. Please sign in again.'));
-                        break;
-                    case 'storage/canceled':
-                        reject(new Error('Upload was cancelled.'));
-                        break;
-                    case 'storage/retry-limit-exceeded':
-                        reject(new Error('Upload failed after multiple retries. Please try again.'));
-                        break;
-                    default:
-                        reject(new Error(`Upload failed: ${error.message}`));
-                }
-            },
-            async () => {
-                clearTimeout(timeoutId);
-                try {
-                    // Upload completed successfully, get download URL
-                    const url = await getDownloadURL(uploadTask.snapshot.ref);
-                    resolve({
-                        url,
-                        ref: storagePath,
-                        fileName: file.name,
-                    });
-                } catch (urlError) {
-                    reject(new Error('Upload succeeded but failed to get download URL.'));
-                }
-            }
-        );
-    });
+        const result = await response.json();
+
+        if (onProgress) {
+            onProgress(100);
+        }
+
+        return {
+            url: result.url,
+            ref: result.ref,
+            fileName: result.fileName,
+        };
+    } catch (error: any) {
+        console.error('Upload error:', error);
+        throw new Error(error.message || 'Failed to upload file. Please try again.');
+    }
 }
 
 /**
- * Delete a file from Firebase Storage
+ * Delete a file from Cloudinary
  */
-export async function deleteFile(storagePath: string): Promise<void> {
+export async function deleteFile(publicId: string): Promise<void> {
     try {
-        const storageRef = ref(storage, storagePath);
-        await deleteObject(storageRef);
+        const response = await fetch('/api/delete-file', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ publicId }),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Delete failed');
+        }
     } catch (error: any) {
-        // Ignore if file doesn't exist
-        if (error.code !== 'storage/object-not-found') {
+        // Don't throw if file doesn't exist
+        if (!error.message?.includes('not found')) {
             throw error;
         }
     }
 }
 
 /**
- * Get a temporary download URL for a file
- * Note: Firebase Storage URLs are already long-lived tokens
- * For true temporary URLs, we use Firestore to manage access
+ * Get a download URL for a file
+ * With Cloudinary, the URL is already accessible
  */
-export async function getTemporaryUrl(storagePath: string): Promise<string> {
-    const storageRef = ref(storage, storagePath);
-    return await getDownloadURL(storageRef);
+export async function getTemporaryUrl(fileUrl: string): Promise<string> {
+    // Cloudinary URLs are already accessible, just return as-is
+    return fileUrl;
 }
 
 /**
