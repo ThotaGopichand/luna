@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { Button, Card, CardHeader, Badge, Modal, ModalActions } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { getTrade, deleteTrade } from '@/lib/firestore';
+import { deleteFile } from '@/lib/storage';
 import { Trade, MOOD_OPTIONS } from '@/types';
 import { formatINR } from '@/lib/tax-calculator';
 
@@ -48,6 +49,15 @@ export default function TradeDetailPage() {
         if (!user || !trade) return;
         setDeleting(true);
         try {
+            // Delete screenshot from Cloudinary if it exists
+            if (trade.screenshotRef) {
+                try {
+                    await deleteFile(trade.screenshotRef);
+                } catch (err) {
+                    // Continue even if file deletion fails
+                    console.warn('Failed to delete screenshot:', err);
+                }
+            }
             await deleteTrade(user.uid, trade.id);
             router.push('/journal');
         } catch (error) {
